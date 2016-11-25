@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>This blog&#39;s deployment | MFK&#39;s Blog</title>
+<link rel="stylesheet" href="http://blog.michael-kaeufl.de//css/style.css">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/github.min.css">
+
+
+<section class="section">
+  <div class="container">
+    <nav class="nav">
+      <div class="nav-left">
+        <a class="nav-item" href="http://blog.michael-kaeufl.de/"><h1 class="title is-4">MFK&#39;s Blog</h1></a>
+      </div>
+      <div class="nav-right">
+        <nav class="nav-item level is-mobile">
+          
+          <a class="level-item" href="https://github.com/michael-k">
+            <span class="icon">
+              <i class="fa fa-github"></i>
+            </span>
+          </a>
+          
+          <a class="level-item" href="/index.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+          </a>
+          
+        </nav>
+      </div>
+    </nav>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="subtitle is-6">November 25, 2016</h2>
+    <h1 class="title">This blog&#39;s deployment</h1>
+    <div class="content">
+      <p>This is based on
+<a href="http://rcoedo.com/post/hugo-static-site-generator/">“Deploy your blog to github pages automatically using Hugo and Travis”</a>
+by <a href="https://github.com/rcoedo">Roman Coedo</a>.</p>
+
+<p>Start with the hugo setup:</p>
+
+<pre><code class="language-bash">hugo new site myblog
+cd myblog
+mkdir public
+touch archetypes/.gitkeep data/.gitkeep layouts/.gitkeep public/.gitkeep static/.gitkeep
+
+git init
+git remote add origin git@github.com:&lt;owner&gt;/&lt;repo&gt;.git
+git add config.toml */.gitkeep
+
+echo &quot;/keys\n/public\n*~&quot; &gt; .gitignore
+git add .gitignore
+git submodule add https://github.com/tanksuzuki/hemingway.git themes/hemingway
+</code></pre>
+
+<p>Write the first blog post:</p>
+
+<pre><code class="language-bash">hugo new post/this-blogs-deployment.md
+editor post/this-blogs-deployment.md
+git add post/this-blogs-deployment.md
+</code></pre>
+
+<p>Create a Github repository and add it as a remote.  Then
+<a href="https://help.github.com/articles/generating-ssh-keys/">generate a new ssh key</a>,
+store it in <code>keys</code> and encrypt it for travis:</p>
+
+<pre><code class="language-bash">git remote add origin git@github.com:&lt;owner&gt;/&lt;repo&gt;.git
+touch .travis.yml
+mkdir keys
+ssh-keygen -t rsa -b 4096 -C &quot;your_email@example.com&quot;
+docker run --rm -it -v $(pwd):/code ruby:2.3 bash
+
+docker&gt; gem install travis
+docker&gt; cd /code
+docker&gt; travis login
+docker&gt; travis encrypt-file keys/travis_key --add
+docker&gt; exit
+
+sudo chown user:group travis_key
+git add travis_key.enc
+</code></pre>
+
+<p>Add the content of <code>keys/travis_key.pub</code> as a deploy key: <a href="https://github.com/">https://github.com/</a><owner>/<repo>/settings/keys</p>
+
+<p>Also add <code>.travis.yml</code>, <code>Dockerfile</code> and <code>scripts/deploy.sh</code> to the repo (see
+this blogs repo for comparison).</p>
+
+<pre><code class="language-bash">git commit -m &quot;Initial commit&quot;
+git push origin master
+</code></pre>
+
+    </div>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container has-text-centered">
+    <p>&copy; <a href="https://github.com/michael-k">Michael K.</a> 2016</p>
+  </div>
+</section>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/languages/python.min.js"></script>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/languages/go.min.js"></script>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/languages/dockerfile.min.js"></script>
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+

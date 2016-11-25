@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>MFK&#39;s Blog</title>
+    <link>http://blog.michael-kaeufl.de/index.xml</link>
+    <description>Recent content on MFK&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; &lt;a href=&#34;https://github.com/michael-k&#34;&gt;Michael K.&lt;/a&gt; 2016</copyright>
+    <lastBuildDate>Fri, 25 Nov 2016 01:04:17 +0100</lastBuildDate>
+    <atom:link href="http://blog.michael-kaeufl.de/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>This blog&#39;s deployment</title>
+      <link>http://blog.michael-kaeufl.de/post/this-blogs-deployment/</link>
+      <pubDate>Fri, 25 Nov 2016 01:04:17 +0100</pubDate>
+      
+      <guid>http://blog.michael-kaeufl.de/post/this-blogs-deployment/</guid>
+      <description>&lt;p&gt;This is based on
+&lt;a href=&#34;http://rcoedo.com/post/hugo-static-site-generator/&#34;&gt;“Deploy your blog to github pages automatically using Hugo and Travis”&lt;/a&gt;
+by &lt;a href=&#34;https://github.com/rcoedo&#34;&gt;Roman Coedo&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Start with the hugo setup:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;hugo new site myblog
+cd myblog
+mkdir public
+touch archetypes/.gitkeep data/.gitkeep layouts/.gitkeep public/.gitkeep static/.gitkeep
+
+git init
+git remote add origin git@github.com:&amp;lt;owner&amp;gt;/&amp;lt;repo&amp;gt;.git
+git add config.toml */.gitkeep
+
+echo &amp;quot;/keys\n/public\n*~&amp;quot; &amp;gt; .gitignore
+git add .gitignore
+git submodule add https://github.com/tanksuzuki/hemingway.git themes/hemingway
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Write the first blog post:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;hugo new post/this-blogs-deployment.md
+editor post/this-blogs-deployment.md
+git add post/this-blogs-deployment.md
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Create a Github repository and add it as a remote.  Then
+&lt;a href=&#34;https://help.github.com/articles/generating-ssh-keys/&#34;&gt;generate a new ssh key&lt;/a&gt;,
+store it in &lt;code&gt;keys&lt;/code&gt; and encrypt it for travis:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;git remote add origin git@github.com:&amp;lt;owner&amp;gt;/&amp;lt;repo&amp;gt;.git
+touch .travis.yml
+mkdir keys
+ssh-keygen -t rsa -b 4096 -C &amp;quot;your_email@example.com&amp;quot;
+docker run --rm -it -v $(pwd):/code ruby:2.3 bash
+
+docker&amp;gt; gem install travis
+docker&amp;gt; cd /code
+docker&amp;gt; travis login
+docker&amp;gt; travis encrypt-file keys/travis_key --add
+docker&amp;gt; exit
+
+sudo chown user:group travis_key
+git add travis_key.enc
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Add the content of &lt;code&gt;keys/travis_key.pub&lt;/code&gt; as a deploy key: &lt;a href=&#34;https://github.com/&#34;&gt;https://github.com/&lt;/a&gt;&lt;owner&gt;/&lt;repo&gt;/settings/keys&lt;/p&gt;
+
+&lt;p&gt;Also add &lt;code&gt;.travis.yml&lt;/code&gt;, &lt;code&gt;Dockerfile&lt;/code&gt; and &lt;code&gt;scripts/deploy.sh&lt;/code&gt; to the repo (see
+this blogs repo for comparison).&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;git commit -m &amp;quot;Initial commit&amp;quot;
+git push origin master
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
