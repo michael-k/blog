@@ -1,0 +1,24 @@
+baseurl = "http://blog.michael-kaeufl.de/"
+languageCode = "en-us"
+title = "MFK's Blog"
+
+theme = "hemingway"
+
+copyright = "&copy; <a href=\"https://github.com/michael-k\">Michael K.</a> 2016"
+
+[params]
+
+[params.highlight]
+style = "github"
+languages = ["python", "go", "dockerfile"]
+
+[[params.social]]
+url = "https://github.com/michael-k"
+fa_icon = "fa-github"
+
+[[params.social]]
+url = "/index.xml"
+fa_icon = "fa-rss"
+
+[Author]
+    name = "Michael"

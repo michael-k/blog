@@ -1,0 +1,37 @@
+sudo: required
+services:
+  - docker
+
+env:
+  global:
+    - SSH_KEY="travis_blog_deploy"
+    - GIT_NAME="Michael K."
+    - GIT_EMAIL="michael-k@users.noreply.github.com"
+    # The only branch that Travis should deploy from
+    - DEPLOY_BRANCH="master"
+    - SOURCE_DIR="public"
+
+before_install:
+  - openssl aes-256-cbc -K $encrypted_ac356ff71e5e_key -iv $encrypted_ac356ff71e5e_iv
+    -in $SSH_KEY.enc -out $SSH_KEY -d
+
+install:
+  - sudo apt-get update
+  - sudo apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" docker-engine
+  - git submodule init
+  - git submodule update
+
+before_script:
+  - docker version
+  - docker pull golang:latest
+  - docker build -t hugobuilder .
+
+script:
+  - docker run --rm -v $(pwd):/code hugobuilder
+
+after_success:
+  - echo "blog.michael-kaeufl.de" > ./public/CNAME
+  - ./scripts/deploy.sh
+
+after_script:
+  - ls -lR public
